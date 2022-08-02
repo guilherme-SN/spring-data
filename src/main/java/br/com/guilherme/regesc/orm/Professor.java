@@ -1,6 +1,7 @@
 package br.com.guilherme.regesc.orm;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity                                                 // Faz a classe professor virar uma entidade (tabela no BD)
 @Table(name = "professores")                            // Anotação para adicionar configurações na Table
@@ -17,6 +18,9 @@ public class Professor {
 
     @Column(nullable = false, unique = true)
     private String prontuario;
+
+    @OneToMany(mappedBy = "professor")                  // Um professor pode ter várias disciplinas
+    private List<Disciplina> disciplinas;
 
 
     // Método Construtor

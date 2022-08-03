@@ -19,7 +19,7 @@ public class Professor {
     @Column(nullable = false, unique = true)
     private String prontuario;
 
-    @OneToMany(mappedBy = "professor")                  // Um professor pode ter várias disciplinas
+    @OneToMany(mappedBy = "professor", fetch = FetchType.LAZY)
     private List<Disciplina> disciplinas;
 
 
@@ -53,6 +53,22 @@ public class Professor {
 
     public void setProntuario(String prontuario) {
         this.prontuario = prontuario;
+    }
+
+    public List<Disciplina> getDisciplinas() {
+        return disciplinas;
+    }
+
+    public void setDisciplinas(List<Disciplina> disciplinas) {
+        this.disciplinas = disciplinas;
+    }
+
+    @PreRemove                                          // Ação de pré remoção
+    public void atualizaDisciplinaOnRemove() {
+        System.out.println("********** AtualizaDisciplinaOnDelete **********");
+        for (Disciplina disciplina : this.getDisciplinas()) {
+            disciplina.setProfessor(null);
+        }
     }
 
     @Override

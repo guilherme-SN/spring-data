@@ -1,9 +1,11 @@
 package br.com.guilherme.regesc.service;
 
+import br.com.guilherme.regesc.orm.Disciplina;
 import br.com.guilherme.regesc.orm.Professor;
 import br.com.guilherme.regesc.repository.ProfessorRepository;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -17,6 +19,7 @@ public class CrudProfessorService {
         this.professorRepository = professorRepository;
     }
 
+    @Transactional
     public void menu(Scanner scanner) {
         Boolean isTrue = true;
 
@@ -25,32 +28,23 @@ public class CrudProfessorService {
             System.out.println("0 - Voltar ao menu anterior");
             System.out.println("1 - Cadastrar novo professor");
             System.out.println("2 - Atualizar um professor");
-            System.out.println("3 - Deletar um professores");
+            System.out.println("3 - Deletar um professor");
             System.out.println("4 - Visualizar todos professores");
-
+            System.out.println("5 - Visualizar um professor");
 
             int opcao = scanner.nextInt();
 
             switch (opcao) {
-                case 1:
-                    this.cadastrar(scanner);
-                    break;
-                case 2:
-                    this.atualizar(scanner);
-                    break;
-                case 3:
-                    this.deletar(scanner);
-                    break;
-                case 4:
-                    this.visualizar();
-                    break;
-                default:
-                    isTrue = false;
+                case 1 -> this.cadastrar(scanner);
+                case 2 -> this.atualizar(scanner);
+                case 3 -> this.deletar(scanner);
+                case 4 -> this.visualizar();
+                case 5 -> this.visualizarProfessor(scanner);
+                default -> isTrue = false;
             }
         }
         System.out.println("==================================");
     }
-
 
     private void cadastrar(Scanner scanner) {
         System.out.print("Nome do professor: ");
@@ -92,7 +86,6 @@ public class CrudProfessorService {
         }
     }
 
-
     private void visualizar() {
         Iterable<Professor> professores = this.professorRepository.findAll();   // Encontre todos os registros e jogue na variável do tipo Iterable de Professor
 
@@ -102,13 +95,35 @@ public class CrudProfessorService {
         System.out.println("\n");
     }
 
-
     private void deletar(Scanner scanner) {
         System.out.print("Digite o ID do professor a ser deletado: ");
         Long id = scanner.nextLong();
 
         this.professorRepository.deleteById(id);    // Se não existir, vai lançar uma Exception
         System.out.println(">>Professor deletado do BANCO!!!<<<\n");
+    }
+
+    @Transactional
+    private void visualizarProfessor(Scanner scanner) {
+        System.out.println("Digite o ID do professor a ser visualizado: ");
+        Long professorId = scanner.nextLong();
+
+        Optional<Professor> professorOptional = this.professorRepository.findById(professorId);
+        if (professorOptional.isPresent()) {
+            Professor professor = professorOptional.get();
+            System.out.println("Professor{");
+            System.out.println("ID: " + professor.getId());
+            System.out.println("Nome: " + professor.getNome());
+            System.out.println("Prontuário " + professor.getProntuario());
+            System.out.println("Disciplinas{");
+
+            for (Disciplina disciplinas : professor.getDisciplinas()) {
+                System.out.println("\tID: " + disciplinas.getId());
+                System.out.println("\tNome: " + disciplinas.getNome());
+                System.out.println("\tSemestre: " + disciplinas.getSemestre() + "}");
+            }
+            System.out.println("}");
+        }
     }
 }
 

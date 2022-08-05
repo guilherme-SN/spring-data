@@ -1,7 +1,7 @@
 package br.com.guilherme.regesc.orm;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "alunos")
@@ -15,15 +15,16 @@ public class Aluno {
     private Integer idade;
 
     @ManyToMany(mappedBy = "alunos")            // Alunos podem ter várias disciplinas e vice versa
-    private List<Disciplina> disciplinas;       // Um aluno pode ter uma lista de disciplinas
+    private Set<Disciplina> disciplinas;       // Um aluno pode ter uma lista de disciplinas
 
     // Construtores
     public Aluno() {
     }
 
-    public Aluno(String nome, Integer idade) {
+    public Aluno(String nome, Integer idade, Set<Disciplina> disciplinas) {
         this.nome = nome;
         this.idade = idade;
+        this.disciplinas = disciplinas;
     }
 
 
@@ -46,5 +47,22 @@ public class Aluno {
 
     public void setIdade(Integer idade) {
         this.idade = idade;
+    }
+
+    public Set<Disciplina> getDisciplinas() {
+        return disciplinas;
+    }
+
+    public void setDisciplinas(Set<Disciplina> disciplinas) {
+        this.disciplinas = disciplinas;
+    }
+
+    @Override
+    public String toString() {
+        return "Aluno{" +
+                "id=" + id +
+                ", nome='" + nome + '\'' +
+                ", idade=" + idade +
+                '}';
     }
 }

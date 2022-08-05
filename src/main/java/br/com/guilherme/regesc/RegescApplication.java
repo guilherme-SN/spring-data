@@ -2,6 +2,7 @@ package br.com.guilherme.regesc;
 
 import br.com.guilherme.regesc.orm.Professor;
 import br.com.guilherme.regesc.repository.ProfessorRepository;
+import br.com.guilherme.regesc.service.CrudAlunoService;
 import br.com.guilherme.regesc.service.CrudDisciplinaService;
 import br.com.guilherme.regesc.service.CrudProfessorService;
 import org.springframework.boot.CommandLineRunner;
@@ -14,10 +15,12 @@ import java.util.Scanner;
 public class RegescApplication implements CommandLineRunner {
     private CrudProfessorService professorService;
     private CrudDisciplinaService disciplinaService;
+    private CrudAlunoService alunoService;
 
-    public RegescApplication(CrudProfessorService professorService, CrudDisciplinaService disciplinaService) {
+    public RegescApplication(CrudProfessorService professorService, CrudDisciplinaService disciplinaService, CrudAlunoService alunoService) {
         this.professorService = professorService;
         this.disciplinaService = disciplinaService;
+        this.alunoService = alunoService;
     }
 
 	public static void main(String[] args) {
@@ -34,12 +37,14 @@ public class RegescApplication implements CommandLineRunner {
             System.out.println("0 - Sair");
             System.out.println("1 - Professor");
             System.out.println("2 - Disciplina");
+            System.out.println("3 - Aluno");
 
             int opcao = scanner.nextInt();
 
             switch (opcao) {
                 case 1 -> this.professorService.menu(scanner);
                 case 2 -> this.disciplinaService.menu(scanner);
+                case 3 -> this.alunoService.menu(scanner);
                 default -> isTrue = false;
             }
        }

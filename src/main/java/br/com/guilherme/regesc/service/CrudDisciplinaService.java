@@ -1,22 +1,25 @@
 package br.com.guilherme.regesc.service;
 
+import br.com.guilherme.regesc.orm.Aluno;
 import br.com.guilherme.regesc.orm.Disciplina;
 import br.com.guilherme.regesc.orm.Professor;
+import br.com.guilherme.regesc.repository.AlunoRepository;
 import br.com.guilherme.regesc.repository.DisciplinaRepository;
 import br.com.guilherme.regesc.repository.ProfessorRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
 
 @Service
 public class CrudDisciplinaService {
     private DisciplinaRepository disciplinaRepository;
     private ProfessorRepository professorRepository;
+    private AlunoRepository alunoRepository;
 
-    public CrudDisciplinaService(DisciplinaRepository disciplinaRepository, ProfessorRepository professorRepository) {
+    public CrudDisciplinaService(DisciplinaRepository disciplinaRepository, ProfessorRepository professorRepository, AlunoRepository alunoRepository) {
         this.disciplinaRepository = disciplinaRepository;
         this.professorRepository = professorRepository;
+        this.alunoRepository = alunoRepository;
     }
 
     public void menu(Scanner scanner) {
@@ -29,25 +32,17 @@ public class CrudDisciplinaService {
             System.out.println("2 - Atualizar uma disciplina");
             System.out.println("3 - Deletar uma disciplina");
             System.out.println("4 - Visualizar todas disciplinas");
-
+            System.out.println("5 - Matricular alunos");
 
             int opcao = scanner.nextInt();
 
             switch (opcao) {
-                case 1:
-                    this.cadastrar(scanner);
-                    break;
-                case 2:
-                    this.atualizar(scanner);
-                    break;
-                case 3:
-                    this.deletar(scanner);
-                    break;
-                case 4:
-                    this.visualizar();
-                    break;
-                default:
-                    isTrue = false;
+                case 1 -> this.cadastrar(scanner);
+                case 2 -> this.atualizar(scanner);
+                case 3 -> this.deletar(scanner);
+                case 4 -> this.visualizar();
+                case 5 -> this.matricularAlunos(scanner);
+                default -> isTrue = false;
             }
         }
         System.out.println("==================================");
@@ -126,5 +121,44 @@ public class CrudDisciplinaService {
 
         this.disciplinaRepository.deleteById(id);    // Se não existir, vai lançar uma Exception
         System.out.println(">>>Disciplina deletada do BANCO!!!<<<\n");
+    }
+
+    private Set<Aluno> matricular(Scanner scanner) {
+        Boolean isTrue = true;
+        Set<Aluno> alunos = new HashSet<Aluno>();
+
+        while (isTrue) {
+            System.out.print("Digite o ID do aluno a ser matriculado (0 para sair): ");
+            Long alunoId = scanner.nextLong();
+
+            if (alunoId > 0) {
+                Optional<Aluno> alunoOptional = this.alunoRepository.findById(alunoId);
+                if (alunoOptional.isPresent()) {
+                    alunos.add(alunoOptional.get());
+                } else {
+                    System.out.println("ID do aluno inválido!");
+                }
+            } else {
+                isTrue = false;
+            }
+        }
+        return alunos;
+    }
+
+    private void matricularAlunos(Scanner scanner) {
+        System.out.print("Digite o ID da disciplina para matricular alunos: ");
+        Long disciplinaId = scanner.nextLong();
+
+        Optional<Disciplina> optionalDisciplina = this.disciplinaRepository.findById(disciplinaId);
+        if (optionalDisciplina.isPresent()) {
+            Disciplina disciplina = optionalDisciplina.get();
+
+            Set<Aluno> novosAlunos = this.matricular(scanner);
+            disciplina.getAlunos().addAll(novosAlunos);
+
+            this.disciplinaRepository.save(disciplina);
+        } else {
+            System.out.println("ID da disciplina inválido!");
+        }
     }
 }

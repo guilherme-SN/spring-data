@@ -1,7 +1,7 @@
 package br.com.guilherme.regesc.orm;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "disciplinas")
@@ -18,11 +18,11 @@ public class Disciplina {
     @JoinColumn(name = "professor_id", nullable = true)     // Define o nome da coluna de junção (nome da FK da classe Professor)
     private Professor professor;
 
-    @ManyToMany     // Disciplinas podem ter vários alunos e vice versa
+    @ManyToMany(fetch = FetchType.EAGER)        // Disciplinas podem ter vários alunos e vice versa
     @JoinTable(name = "disciplinas_alunos",     // Nome da tabela intermediária da relação disciplinas <--> alunos
                joinColumns = @JoinColumn(name = "disciplina_fk"),       // Nome da foreign key do owning side
                inverseJoinColumns = @JoinColumn(name = "aluno_fk"))     // Nome da foreign key do non-owning side
-    private List<Aluno> alunos;     // Uma disciplina pode ter uma lista de alunos
+    private Set<Aluno> alunos;     // Uma disciplina pode ter uma lista de alunos
 
     // Construtores
     @Deprecated
@@ -65,6 +65,14 @@ public class Disciplina {
         this.professor = professor;
     }
 
+    public Set<Aluno> getAlunos() {
+        return alunos;
+    }
+
+    public void setAlunos(Set<Aluno> alunos) {
+        this.alunos = alunos;
+    }
+
     @Override
     public String toString() {
         return "Disciplina{" +
@@ -72,6 +80,7 @@ public class Disciplina {
                 ", nome='" + nome + '\'' +
                 ", semestre=" + semestre +
                 ", professor=" + professor +
+                ", alunos=" + alunos +
                 '}';
     }
 }
